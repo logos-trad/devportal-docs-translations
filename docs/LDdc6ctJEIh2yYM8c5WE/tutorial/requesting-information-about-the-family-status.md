@@ -1,33 +1,33 @@
-# Richiediamo informazioni sullo stato di famiglia
+# Requesting information about the family status
 
-L’e-service “Attestazione - Family Status” pubblicato sul catalogo, offre un servizio mediante il quale è possibile verificare la correttezza delle informazioni legate allo stato di famiglia simulando un ente che possiede le informazioni aggiornate e centralizzate legate allo stato di famiglia.
+The “Certification- Family Status” e-service published in the catalog offers a service through which it is possible to verify the correctness of the information related to a family status, simulating an institution that has the updated and centralized information related to the family status.
 
-In questo tutorial vedremo un caso reale di applicazione di questo servizio.
+This tutorial shows an actual case of using this service.
 
-## **Il caso d'uso**
+## **The use case**
 
-Come fruitore, ho la necessità di **verificare le informazioni** presenti sulla mia base dati e **legate allo stato di famiglia dei soggetti.** Per procedere, dovrò effettuare  la sottoscrizione all’e-service “Attestazione - Family status” che perme di recuperare questi dati grazie all’invocazione della seguente  API:
+As a user, I need to **verify the information** present in my database and **related to the family status of the subjects.** To do so, I must subscribe to the “Certification - Family Status” e-service, which makes it possible to recover this data through the invocation of the following API:
 
 `POST /family-status`
 
 ## Data Preparation
 
-La prima cosa da fare, come abbiamo visto, è la configurazione dei dati. Procediamo dunque, per la prima volta, alla fase di Data Preparation.
+The first thing to do, as we have seen, is to configure the data. Therefore we will proceed, for the first time, with the Data Preparation phase.
 
-Facendo riferimento al problema sopra esposto, supponiamo di avere la seguente base dati all’interno della nostra applicazione
+In reference to the problem indicated above, in this example we have the following database in our application
 
-| ID               | Nome  | Cognome | Stato civile | Data inizio relazione | Data fine relazione |
-| ---------------- | ----- | ------- | ------------ | --------------------- | ------------------- |
-| RSSMRA80A01H501U | Mario | Rossi   | CONIUGATO    | 01/01/2022            | NULL                |
-| LGUBCH80A01H501B | Luigi | Bianchi | CELIBE       | 01/06/1988            | NULL                |
+| ID| Name| Surname| Civil status| Relationship start date| Relationship end date|
+|----------|----------|----------|----------|----------|----------|
+| RSSMRA80A01H501U| Mario| Rossi| MARRIED| 01/01/2022| NULL|
+| LGUBCH80A01H501B| Luigi| Bianchi| SINGLE| 01/06/1988| NULL|
 
-In accordo a questa effettuiamo la data preparation simulando il seguente scenario:
+Based on this, data preparation is performed by simulating the following scenario:
 
-●     L’id **RSSMRA80A01H501U** è un soggetto per il quale è noto lo stato di famiglia come CONIUGATO
+●     The ID **RSSMRA80A01H501U** is a subject for which the family status is known as MARRIED
 
-●     L’id **LGUBCH80A01H501B** è un soggetto per il quale è noto lo stato di famiglia come CELIBE
+●     The ID **LGUBCH80A01H501B** is a subject for which the family status is known as SINGLE
 
-Replichiamo la configurazione desiderata nel seguente modo:
+We can replicate the desired configuration as follows:
 
 `POST /family-status`
 
@@ -69,9 +69,9 @@ application/json
         }
     },
     "subjectLink": {
-        "relationshipType": "Coniuge",
+        "relationshipType": "Spouse",
         "startDate": "2021-11-15",
-        "relationshipCode": "CONIUGE",
+        "relationshipCode": "SPOUSE",
         "memberSequence": "01",
         "startDateRelationship": "2022-01-01"
     }
@@ -89,9 +89,9 @@ application/json
 
 **Status codes:**
 
-●     200 - Configurazione salvata con successo
+●     200 - Configuration saved successfully
 
-Procediamo con il censimento anche del secondo soggetto, simulando che l’erogatore sia a conoscenza dell’indirizzo.
+The second subject can now be registered, simulating that the provider knows the address.
 
 **Header:**
 
@@ -131,9 +131,9 @@ application/json
         }
     },
     "subjectLink": {
-        "relationshipType": "Coniuge",
+        "relationshipType": "Spouse",
         "startDate": "2023-07-01",
-        "relationshipCode": "CONIUGE",
+        "relationshipCode": "SPOUSE",
         "memberSequence": "01",
         "startDateRelationship": "1988-06-01"
     }
@@ -151,33 +151,31 @@ application/json
 
 **Status codes:**
 
-●     200 - Configurazione salvata con successo
+●     200 - Configuration saved successfully
 
-Dato il nostro scenario abbiamo completato la fase di configurazione.
+Given our scenario, we have completed the configuration phase.
 
-Procediamo a questo punto all’invocazione delle API messe a disposizione dell’e-service.
+At this point we can invoke the APIs provided by the e-service.
 
-## Invocazione e-service
+## E-service invocation
 
-Completata la fase di configurazione non resta che procedere all’invocazione del servizio effettuando la verifica per i due soggetti presenti nella mia base dati.
+Once the completion phase is completed, proceed with the invocation of the service performing the verification for the two subjects in my database.
 
-Nello specifico, andremo a verificare la correttezza delle informaizoni invocando la seguente API
+Specifically, we will verify the correctness of the information by invoking the following API
 
 `POST /family-status`
 
-che ci permette di recuperare le informazioni a partire dall’id del soggetto.
+that allows us to recover the information using the ID of the subject.
 
-Prima di procedere all’invocazione dei suddetti è importante sapere che l’e-service in questione prevede un ulteriore livello di sicurezza. Le api prevedono, infatti, l’invio di due header aggiuntivi:
+Before invoking the above, it is important to know that the e-service in question requires another level of security. The APIs require in fact two additional headers to be sent:
 
 ●     [Agid-JWT-TrackingEvidence](broken-reference)
 
 ●     [Agid-JWT-Signature](broken-reference)
 
+After correctly generating the above tokens and the voucher, we can proceed with the following requests.
 
-
-Dopo aver generato correttamente i token di cui sopra e il Voucher, possiamo procedere con le seguenti request.
-
-Invochiamo prima di tutto l’eservice per il soggetto “Mario Rossi”
+First of all we will invoke the e-service for the subject “Mario Rossi”
 
 ```bash
 curl --location '{host}/family-status' \
@@ -194,8 +192,8 @@ curl --location '{host}/family-status' \
   },
   "requestData": {
     "dateOfRequest": "2024-11-13",
-    "useCase": "Verifica",
-    "motivation": "Verifica informaizoni"
+    "useCase": "Verification motivation",
+    "motivation": "Verification information"
   }
 }'
 ```
@@ -243,9 +241,9 @@ application/json
                     "note": ""
                 },
                 "subjectLink": {
-                    "relationshipType": "Coniuge",
+                    "relationshipType": "Spouse",
                     "startDate": "2021-11-15",
-                    "relationshipCode": "CONIUGE",
+                    "relationshipCode": "SPOUSE",
                     "memberSequence": "01",
                     "startDateRelationship": "2022-01-01"
                 }
@@ -257,9 +255,9 @@ application/json
 
 **Status codes:**
 
-●     **200** - Richiesta effettuata con successo
+●     **200** - Request made successfully
 
-Procediamo adesso per “Luigi Bianchi”
+Now we will proceed with “Luigi Bianchi”
 
 ```bash
 curl --location '{host}/family-status' \
@@ -276,8 +274,8 @@ curl --location '{host}/family-status' \
   },
   "requestData": {
     "dateOfRequest": "2024-11-13",
-    "useCase": "Verifica",
-    "motivation": "Verifica informaizoni"
+    "useCase": "Verification motivation",
+    "motivation": "Verification information"
   }
 }'
 ```
@@ -325,9 +323,9 @@ application/json
                     "note": ""
                 },
                 "subjectLink": {
-                    "relationshipType": "Coniuge",
+                    "relationshipType": "Spouse",
                     "startDate": "2023-07-01",
-                    "relationshipCode": "CONIUGE",
+                    "relationshipCode": "SPOUSE",
                     "memberSequence": "01",
                     "startDateRelationship": "1988-06-01"
                 }
@@ -339,19 +337,19 @@ application/json
 
 Status codes:
 
-●     200 - Richiesta effettuata con successo
+●     200 - Request made successfully
 
-Le response ricevute ci permettono di aggiornare coerentemente la nostra base dati.
+The received responses allow us to coherently update our database.
 
-## Esito finale
+## Final result
 
-Dopo aver interrogato l’e-service possiamo procedere all’aggiornamento della nostra base dati in base alle informazioni che abbiamo recuperato.
+After querying the e-service, we can update our database based on the information we recovered.
 
-Di seguito una panoramica della situazione a seguito dell’aggiornamento
+An overview of the situation following the update is shown below
 
-| ID               | Nome  | Cognome | Stato civile | Data inizio relazione | Data fine relazione |
-| ---------------- | ----- | ------- | ------------ | --------------------- | ------------------- |
-| RSSMRA80A01H501U | Mario | Rossi   | CONIUGATO    | 01/01/2022            | NULL                |
-| LGUBCH80A01H501B | Luigi | Bianchi | CONIUGATO    | 01/07/2023            | NULL                |
+| ID| Name| Surname| Civil status| Relationship start date| Relationship end date|
+|----------|----------|----------|----------|----------|----------|
+| RSSMRA80A01H501U| Mario| Rossi| MARRIED| 01/01/2022| NULL|
+| LGUBCH80A01H501B| Luigi| Bianchi| MARRIED| 01/07/2023| NULL|
 
-La nostra base dati è stata correttamente aggiornata. Nello specifico è stata confermata che l’informazione per il soggetto RSSMRA80A01H501U è corretto, mentre per il secondo soggetto è stata aggiornata la relazione legata al suo stato di famiglia.
+Our database was updated correctly. Specifically, it was confirmed that the information for the subject RSSMRA80A01H501U is correct, whereas for the second subject the relationship related to their family status was updated.

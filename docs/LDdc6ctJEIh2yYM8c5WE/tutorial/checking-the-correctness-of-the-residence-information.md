@@ -1,12 +1,12 @@
-# Verifichiamo la correttezza delle informazioni di residenza
+# Checking the correctness of the residence information
 
-L’e-service “Attestazione - Residence Verification”, pubblicato sul catalogo, consente di **verificare la presenza e la correttezza di un determinato indirizzo fisico** simulando un ente che possiede le informazioni aggiornate e centralizzate di tutti gli indirizzi di residenza/domicili fisici dei soggetti.
+The “Certification - Residence Verification” e-service published in the catalog makes it possible to **verify the presence and correctness of a certain physical address**, simulating an institution that has all the updated and centralized information related to all the physical residence/domicile addresses of the subjects.
 
-In questo tutorial vedremo un caso reale di applicazione di questo servizio.
+This tutorial shows an actual case of using this service.
 
-## **Il caso d'uso**
+## **The use case**
 
-Come fruitore, ho la necessità di **verificare la correttezza delle informazioni presenti sulla mia base dati** relative agli indirizzi fisici dei soggetti.  Per procedere, dovrò effettuare la sottoscrizione all’e-service “Attestazione - Residence Verification”, che consente di recuperare questi dati grazie all’invocazione del seguente set di API:
+As a user, I need to **verify the correctness of the information present in my database** related to the physical addresses status of the subjects.  To do so, I must subscribe to the “Certification - Residence Verification” e-service, which makes it possible to recover this data through the invocation of the following set of APIs:
 
 `POST /residence-verification`
 
@@ -14,18 +14,18 @@ Come fruitore, ho la necessità di **verificare la correttezza delle informazion
 
 ## Data preparation
 
-La prima cosa da fare è la configurazione dei dati. Procediamo dunque, per la prima volta, alla fase di Data Preparation.
+The first thing to do is to configure the data. Therefore we will proceed, for the first time, with the Data Preparation phase.
 
-Facendo riferimento al problema sopra esposto, supponiamo di avere la seguente base dati all’interno della nostra applicazione
+In reference to the problem indicated above, in this example we have the following database in our application
 
-<table data-header-hidden><thead><tr><th width="235">ID</th><th width="96">Nome</th><th width="143">Cognome</th><th>CAP</th><th>Città</th></tr></thead><tbody><tr><td>RSSMRA80A01H501U</td><td>Mario</td><td>Rossi</td><td>00100</td><td>Roma</td></tr><tr><td>LGUBCH80A01H501B</td><td>Luigi</td><td>Bianchi</td><td>NULL</td><td>NULL</td></tr></tbody></table>
+<table data-header-hidden><thead><tr><th width="235">ID</th><th width="96">Name</th><th width="143">Surname</th><th>ZIP CODE</th><th>City</th></tr></thead><tbody><tr><td>RSSMRA80A01H501U</td><td>Mario</td><td>Rossi</td><td>00100</td><td>Rome</td></tr><tr><td>LGUBCH80A01H501B</td><td>Luigi</td><td>Bianchi</td><td>NULL</td><td>NULL</td></tr></tbody></table>
 
-In accordo a questa effettuiamo la data preparation simulando il seguente scenario:
+Based on this, data preparation is performed by simulating the following scenario:
 
-1. L’id **RSSMRA80A01H501U** è un soggetto noto a cui è associato l’indirizzo di residenza ed è ancora valido
-2. L’id **LGUBCH80A01H501B** è un soggetto noto per il quale però non siamo a conoscenza dell’attuale indirizzo di residenza.
+1. The ID **RSSMRA80A01H501U** is a known subject that is associated with the address of residence and is still valid
+2. The ID **LGUBCH80A01H501B** is a known subject for which we do not know the current address of residence.
 
-Replichiamo la configurazione desiderata nel seguente modo:
+We can replicate the desired configuration as follows:
 
 `POST /residence-verification/data-preparation`
 
@@ -78,17 +78,13 @@ application/json
 
 **Status codes:**
 
-**`200`**` ``- Configurazione salvata con successo`
+**`200`**` ``- Configuration saved successfully`
 
-Procediamo con il censimento anche del secondo soggetto, simulando che l’erogatore sia a conoscenza dell’indirizzo.
+The second subject can now be registered, simulating that the provider knows the address.
 
 **Header:**
 
-```
-Content-Type: application/json
-Authorization: Bearer {{bearerToken}}
-x-correlation-id: {{myUniqueCorrelationId}}
-```
+``` Content-Type: application/json Authorization: Bearer {{bearerToken}} x-correlation-id: {{myUniqueCorrelationId}} ```
 
 **Payload:**
 
@@ -130,88 +126,88 @@ application/json
 
 **Status codes:**
 
-**`200`**` ``- Configurazione salvata con successo`
+**`200`**` ``- Configuration saved successfully`
 
-Dato il nostro scenario abbiamo completato la fase di configurazione.
+Given our scenario, we have completed the configuration phase.
 
-## Generazione dei Token Agid
+## Generation of the Agid tokens
 
 ### Agid-JWT-TrackingEvidence
 
-Per poter procedere all’invocazione delle API, l'utente deve presentare anche il token di audit "Agid-JWT-TrackingEvidence", come richiesto dal pattern "AUDIT\_REST\_01"
+To proceed with the invocation of the APIs, the user must present also the audit token "Agid-JWT-TrackingEvidence", as required by the pattern "AUDIT_REST_01"
 
-Il pattern garantisce i seguenti punti:
+The pattern guarantees the following points:
 
-* L'autenticità della comunicazione tra il servizio erogato e ciascun utente è assicurata tramite la sicurezza a livello di messaggio, seguendo il pattern "ID\_AUTH\_REST\_01 via PDND".
-* Le informazioni di audit necessarie al fornitore per identificare l'origine specifica di ogni richiesta di accesso ai dati effettuata dall'utente sono incluse in un token di audit conforme al pattern "AUDIT\_REST\_01". Queste informazioni vengono trasmesse dall'applicazione dell'utente attraverso l'header HTTP.
+* The authenticity of the communication between the provided service and each user is associated by means of security on a message level, following the pattern "ID_AUTH_REST_01 via PDND".
+* The audit information necessary for the supplier to identify the specific origin of each data access request performed by the user is included in an audit token that conforms with the pattern "AUDIT_REST_01". This information is transmitted by the user application to the HTTP header.
 
-Di seguito riportiamo le linee guida utili alla generazione del suddetto token:
+The guidelines to be used for the generation of the said token are provided below:
 
-1. Utilizzare una libreria JWT: a seconda del linguaggio di programmazione scelto è possibile utilizzare differenti librerie. Per fare un esempio è possibile usare una libreria come jsonwebtoken per Node.js oppure Java, pyjwt per Python, o altre librerie JWT disponibili nei vari linguaggi di programmazione.
-2. Definire il payload del token: Il payload del JWT deve contenere le informazioni richieste dal pattern "AUDIT\_REST\_01":
-   * **iat** (Issued At): la data e l'ora in cui il token è stato emesso, espressa in secondi.
-   * **exp** (Expiration): la data e l'ora di scadenza del token.
-   * **sub** (Subject): l'identificativo del soggetto, ovvero il clientId censito su PDND.
-   * **iss**(Issuer): l'identificativo del soggetto, ovvero il clientId censito su PDND.
-   * **aud**(Audience): l'identificativo dell'audience, reperibile sempre nella sezione dedicata al tuo client;
-   * &#x20;**purposeId**: rappresenta l’id della finalità
-   * &#x20;**jti** (JWT ID): un identificativo univoco del token.
-3. Firmare il token: Dopo aver creato il payload, è necessario firmare il token con la chiave privata caricata sulla PDND in fase di registazione del client (riferimento al paragrafo[ ](https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher)[https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher](https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher)).\
-   &#x20;La firma deve essere generata utilizzando un algoritmoRS256 (RSA con SHA-256) e chiave privata PKCS#8. La chiave privata utilizzata per la firma deve essere quella associata alla chiave pubblica registrata sulla PDND.
-4. Generare il JWT: Una volta preparati il payload e la firma, non resta che utilizzare la libreria JWT per la creazione del token.
-5. Includere il token nell'header della richiesta: Una volta generato, il token "Agid-JWT-TrackingEvidence" va inserito nell'header HTTP della richiesta.
+1. Use a JWT library: depending on the selected programming language, it is possible to use different libraries. For example, it is possible to use a library such as jsonwebtoken for Node.js or Java, pyjwt for Python, or other JWT libraries available in the various programming languages.
+2. Define the token payload: The JWT payload must contain the information required by the pattern "AUDIT_REST_01":
+   * **iat** (Issued At): the date and time the token was issued, expressed in seconds.
+   * **exp** (Expiration): the date and time of token expiration.
+   * **sub** (Subject): the identifier of the subject, that is the clientId registered in PDND.
+   * **iss** (Issuer): the identifier of the subject, that is the clientId registered in PDND.
+   * **aud**(Audience): the identifier of the audience, can also be found in the section dedicated to your client;
+   *  **purposeId:** the ID of the purpose
+   *  **jti** (JWT ID): a univocal identifier of the token.
+3. [ ]Sign the token: After creating the payload, the token must be signed using the private key uploaded to PDND during client registration (reference to paragraph (https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guide+Operative+Environment+Certification#3.4.1-How to generate the voucher)[https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher](https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher)).  
+ The signature must be generated using an algorithm RS256 (RSA with SHA-256) and private key PKCS#8. The private key used for the signature must be the one associated with the public key registered on PDND.
+4. Generate the JWT: Once the payload and signature are prepared, the JWT library can be used to create the token.
+5. Include the token in the header of the request: Once generated the token "Agid-JWT-TrackingEvidence" must be inserted in the HTTP header of the request.
 
-Se tutti i passaggi sopra riportati sono stati eseguiti correttamente l’erogatore verificherà correttamente il token e risponderà con successo alla richiesta.
+If all the steps indicated above have been performed correctly, the provider will correctly verify the token and respond successfully to the request.
 
 ### Agid-JWT-Signature
 
-L'AgID-JWT-Signature, in maniera analoga al precedente è un token JSON Web Token (JWT).
+The AgID-JWT-Signature, similar to the previous one, is a JSON Web Token (JWT).
 
-Lo scopo di tale token è quello di garantire l'integrità e l'autenticità delle comunicazioni, in conformità con le linee guida dettate dall'Agenzia per l'Italia Digitale (AgID).
+The purpose of this token is to guarantee the integrity and authenticity of the communications, in compliance with the guidelines dictated by the Agency for Digital Italy (AgID).
 
-Nello specifico, implementa il pattern model “INTEGRITY\_REST\_02”.
+Specifically, it implements the pattern model “INTEGRITY_REST_02”.
 
-Di seguito riportiamo le linee guida utili alla generazione del suddetto token:
+The guidelines to be used for the generation of the said token are provided below:
 
-1. **Utilizzare una libreria JWT:** a seconda del linguaggio di programmazione scelto è possibile utilizzare differenti librerie. Per fare un esempio è possibile usare una libreria come jsonwebtoken per Node.js oppure Java, pyjwt per Python, o altre librerie JWT disponibili nei vari linguaggi di programmazione.
-2. **Definire il payload del token:** Il payload del JWT deve contenere le informazioni richieste dal pattern "AUDIT\_REST\_01":
-   * **iat (Issued At):** la data e l'ora in cui il token è stato emesso, espressa in secondi.
-   * **exp (Expiration):** la data e l'ora di scadenza del token.
-   * **sub (Subject):** l'identificativo del soggetto, ovvero il clientId censito su PDND.
-   * **iss(Issuer):** l'identificativo del soggetto, ovvero il clientId censito su PDND.
-   * **aud(Audience):** l'identificativo dell'audience, reperibile sempre nella sezione dedicata al tuo client;
-   * **kid:** l'id della chiave che si usa per firmare l'asserzion&#x65;_,_ reperibile all’interno del tuo client, sotto la sezione _“Client assertion”_
-   * **jti (JWT ID):** un identificativo univoco del token.
-   * **signed\_header:** contiene il digest del contenuto (hash dei dati) calcolato con l'algoritmo SHA-256 e il tipo di contenuto, impostato (ad esempio application/json).\
-     Relativamente a questo campo, riportiamo di seguito uno snippet di codice esplicativo per la sua valorizzazione
+1. **Use a JWT library:** depending on the selected programming language, it is possible to use different libraries. For example, it is possible to use a library such as jsonwebtoken for Node.js or Java, pyjwt for Python, or other JWT libraries available in the various programming languages.
+2. **Define the token payload:** The JWT payload must contain the information required by the pattern "AUDIT_REST_01":
+   * **iat (Issued At)**: the date and time the token was issued, expressed in seconds.
+   * **exp (Expiration):** the date and time of token expiration.
+   * **sub (Subject)**: the identifier of the subject, that is the clientId registered in PDND.
+   * **iss** (Issuer): the identifier of the subject, that is the clientId registered in PDND.
+   * **aud(Audience):** the identifier of the audience, can also be found in the section dedicated to your client;
+   * **kid:** the ID of the key used to sign the assertion\_,\_ which can be found in your client area, under the section _“Client assertion”_
+   * **jti (JWT ID)**: a univocal identifier of the token.
+   * **signed_header:** contains the digest of the content (data hash) calculated with the algorithm SHA-256 and the type of content, set (for example application/json).  
+An explanatory snippet of code is shown below for setting this field
 
-**Esempio in Java:**
+**Example in Java:**
 
 ```java
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.HashMap;
 import java.nio.charset.StandardCharsets;
- 
-// jsonInputString è la request su cui calcolo il digest
+
+// jsonInputString is the request used to calculate the digest
 String jsonInputString = "My request";
- 
+
 try {
-    // Calcolo del digest utilizzando SHA-256
+// Calculate the digest using SHA-256
     MessageDigest digest = MessageDigest.getInstance("SHA-256");
     byte[] hash = digest.digest(jsonInputString.getBytes(StandardCharsets.UTF_8));
     String encodedBody = Base64.getEncoder().encodeToString(hash);
- 
-    // Costruzione delle due mappe da settare come claims
-    HashMap<String, String> m = new HashMap<String, String>();
-    // Setto la request sopra calcolata
-    m.put("digest", "SHA-256=" + encodedBody);
- 
-    HashMap<String, String> m2 = new HashMap<String, String>();
-    // Setto il content type della richiesta
+
+    // Creation of two maps to set as claims
+    HashMap<String, String>m = new HashMap<String, String>();
+    // Set the request calculated above
+    m.put(&quot;digest&quot;, "SHA-256=" + encodedBody);
+
+    HashMap<String, String>m2 = new HashMap<String, String>();
+    // Set the content type of request
     m2.put("content-type", "application/json");
- 
-    // Valorizzo il claim con le mappe sopra valorizzate
+
+    // Use the maps created above HashMap for the claim
     HashMap<String, Object> claims = new HashMap<String, Object>();
     claims.put("signed_headers", new Object[] {m, m2});
  
@@ -223,7 +219,7 @@ try {
     }
 ```
 
-Il payload ottenuto a seguito di questo step avrà una forma simile alla seguente:
+The form of the payload obtained following this step will be similar to the following:
 
 {% code overflow="wrap" %}
 ```json
@@ -247,16 +243,16 @@ Il payload ottenuto a seguito di questo step avrà una forma simile alla seguent
 ```
 {% endcode %}
 
-3. **Firmare il token:** Dopo aver creato il payload, è necessario firmare il token con la chiave privata caricata sulla PDND in fase di registazione del client (riferimento al paragrafo[ ](https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher)[https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher](https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher)).\
-   &#x20;La firma deve essere generata utilizzando un algoritmoRS256 (RSA con SHA-256)
-4. **Generare il JWT:** Una volta preparati il payload e la firma, non resta che utilizzare la libreria JWT per la creazione del token.
-5. **Includere il token nell'header della richiesta:** Una volta generato, il token "Agid-JWT-Signature" va inserito nell'header HTTP della richiesta.
+3. [ ]**Sign the token:** After creating the payload, the token must be signed using the private key uploaded to PDND during client registration (reference to paragraph (https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guide+Operative+Environment+Certification#3.4.1-How to generate the voucher)[https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher](https://pagopa.atlassian.net/wiki/spaces/ADA/pages/1289945113/Guida+Operativa+Ambiente+Attestazione#3.4.1-Come-generare-il-Voucher)).  
+ The signature must be generated using an algorithm RS256 (RSA with SHA-256)
+4. **Generate the JWT:** Once the payload and signature are prepared, the JWT library can be used to create the token.
+5. **Include the token in the header of the request:** Once generated, the token "Agid-JWT-Signature" must be inserted in the HTTP header of the request.
 
-Se tutti i passaggi sopra riportati sono stati eseguiti correttamente l’erogatore verificherà correttamente il token e risponderà con successo alla richiesta.
+If all the steps indicated above have been performed correctly, the provider will correctly verify the token and respond successfully to the request.
 
-## Invocazione e-service per verifica informazioni
+## E-service invocation for information verification
 
-Adesso che abbiamo generato tutti i token previsti dai controlli di sicurezza del servizio, possiamo procedere alla verifica delle informazioni presenti sulla nostra base dati. Per il soggetto “**Mario Rossi**”, del quale conosciamo già l’indirizzo di residenza e dobbiamo verificare la corrispondenza delle informazioni, invochiamo la seguente API:
+Now that all the tokens required by the service security checks have been generated, we can verify the information present in our database. For the subject “**Mario Rossi**”, whose residence address we know and for whom we have to check the correspondence of the information, we invoke the following API:
 
 `POST /residence-verification/check`
 
@@ -376,13 +372,13 @@ application/json
 
 Status codes:
 
-**`200`**` ``- Richiesta effettuata con successo`
+**`200`**` ``- Request made successfully””
 
-Dalla response ricevuta deduciamo che le informazioni presenti sulla nostra base dati sono effettivamente coerenti con quanto detenuto dall’erogatore
+From the received response, we can see that the information present in our database is coherent with the provider information
 
-## Invocazione e-service per richiesta informazioni
+## E-service invocation for information request
 
-Per il soggetto “Luigi Bianchi”, del quale non conosciamo l’indirizzo di residenza, invochiamo la seguente API:
+For the subject “Luigi Bianchi”, whose address of we do not know, we invoke the following API:
 
 `POST /residence-verification`
 
@@ -520,16 +516,16 @@ application/json
 
 Status codes:
 
-**`200`**` ``- Richiesta effettuata con successo`
+**`200`**`- Request made successfully`
 
-Dalla response ricevuta possiamo arricchire la nostra base dati con le informaizoni ricevute.
+From the received response, we can add the received information to our database.
 
-## Esito Finale
+## Final result
 
-Dopo aver interrogato l’e-service possiamo procedere all’aggiornamento della nostra base dati in base alle informazioni che abbiamo recuperato.
+After querying the e-service, we can update our database based on the information we recovered.
 
-Di seguito una panoramica della situazione a seguito dell’aggiornamento
+An overview of the situation following the update is shown below
 
-<table data-header-hidden><thead><tr><th width="259">ID</th><th width="97">Nome</th><th>Cognome</th><th>CAP</th><th>Città</th></tr></thead><tbody><tr><td>RSSMRA80A01H501U</td><td>Mario</td><td>Rossi</td><td>00100</td><td>Roma</td></tr><tr><td>LGUBCH80A01H501B</td><td>Luigi</td><td>Bianchi</td><td>10024</td><td>Torino</td></tr></tbody></table>
+<table data-header-hidden><thead><tr><th width="259">ID</th><th width="97">Name</th><th>Surname</th><th>ZIP CODE</th><th>City</th></tr></thead><tbody><tr><td>RSSMRA80A01H501U</td><td>Mario</td><td>Rossi</td><td>00100</td><td>Rome</td></tr><tr><td>LGUBCH80A01H501B</td><td>Luigi</td><td>Bianchi</td><td>10024</td><td>Turin</td></tr></tbody></table>
 
-La nostra base dati è stata correttamente aggiornata e abbiamo arricchito il soggetto Luigi Bianchi con le informazioni mancanti.
+Our database has been updated correctly and we have added the missing information to the subject Luigi Bianchi.

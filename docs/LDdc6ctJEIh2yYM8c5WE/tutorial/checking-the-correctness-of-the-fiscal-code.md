@@ -1,17 +1,15 @@
-# Verifichiamo la correttezza del Codice Fiscale
+# Checking the correctness of the fiscal code
 
-Il servizio Accertamento Codice Fiscale simula, a partire da un criterio di ricerca, l’ottenimento del codice fiscale di un cittadino.
+The fiscal code verification service uses a search criterion to simulate the obtainment of the fiscal code of a citizen.
 
-Per eseguire correttamente il flusso di Accertamento Codice Fiscale bisogna:
+Proceed as follows to correctly perform the fiscal code verification flow:
 
-* Creare ‘Voucher Interop' ed inserirlo all’interno del Header come Bearer Token.
-* Generare un certificato client, utilizzando il tool OpenSSL, partendo dalla generazione della chiave privata (a 2048 bit nell’esempio):
+* Create ‘Voucher Interop' and insert it in the Header as a Bearer Token.
+* Generate a client certificate, using the OpenSSL tool, starting with the generation of the private key (2048 bit in the example):
 
-```bash
-openssl genrsa -out private-key.pem 2048
-```
+```bash openssl genrsa -out private-key.pem 2048 ```
 
-per poi generare anche il certificato, contenente al suo interno la chiave pubblica (della durata di 365 giorni nell’esempio):
+and then generate also the certificate that contains the pubic key (which lasts 365 days in the example):
 
 {% code overflow="wrap" %}
 ```bash
@@ -19,11 +17,10 @@ openssl req -new -x509 -key private-key.pem -out cert.pem -days 365
 ```
 {% endcode %}
 
-* Modifica la curl sotto con le informazioni recuperate, quindi il bearerToken ed l’apikey
-* Aggiorna il path del file contentente il certificato, con il percorso esatto dove è presente il file sulla macchina dal quale viene testato l’e-service
-* Creare apikey come descritto nella sezione “Dettaglio“ ed utilizzarlo anche per le successive chiamate
-* Contattare API di Handshake per inserire il certificato:\
-
+* Change the curl under the recovered information, then the bearerToken and the apikey
+* Update the path of the file containing the certificate, with the exact path where the file is present on the machine from which the e-service is tested
+* Create the apikey as described in the “Details” section and use it also for the following calls
+* Contact the Handshake API to insert the certificate:\\
 
 {% code overflow="wrap" %}
 ```bash
@@ -35,12 +32,12 @@ curl --location 'https://mtls.eservices.att.interop.pagopa.it/fiscalcode-verific
 ```
 {% endcode %}
 
-* Contattare l'API di Data Preparation per inserire i dati di test all’interno del database.\
-  Nell'esempio di comando curl, è possibile modificare i seguenti parametri:
-  * x-correlation-id: aggiornare con un dato valido, come indicato nella sezione ‘Dettaglio’.
-  * authorization: aggiornare con un token valido.
-  * apikey: creato nel punto precedente.
-  * data: JSON della richiesta; è possibile modificare tutti i dati al suo interno, mantenendo invariati i nomi degli attributi. Ad esempio, se si desidera inviare una nuova richiesta aggiornando il codice fiscale, si deve modificare il valore dell’attributo "codiceFiscale" con "NUOVO\_CODICE”.
+* Contact the Data Preparation API to insert the test data in the database.  
+In the curl command example, the following parameters can be changed:
+  * x-correlation-id: update with valid data, as indicated in the “Details” section.
+  * authorization: update with a valid token.
+  * apikey: created in the previous point.
+  * data: JSON of the request; it is possible to change all the data it contains, keeping the attribute names unchanged. For example, if you want to send a new request, updating the fiscal code, also the value of the "fiscalCode" attribute must be changed with "NEW_CODE”.
 
 {% code overflow="wrap" %}
 ```bash
@@ -54,10 +51,10 @@ curl --location 'https://mtls.eservices.att.interop.pagopa.it/fiscalcode-verific
 ```
 {% endcode %}
 
-* Contattare API per verifica del codice fiscale:\
-  prima di eseguire la curl, aggiorna i dati:
-  * cert: path del file contenente il certificato, con il percorso esatto dove è presente il file sulla macchina dal quale viene testato l’e-service
-  * key: path del file contenente la key, con il percorso esatto dove è presente il file sulla macchina dal quale viene testato l’e-service
+* Contact API to verify the fiscal code:  
+before executing the curl, update the data:
+  * cert: path of the file containing the certificate, with the exact path where the file is present on the machine from which the e-service is tested
+  * key: path of the file containing the key, with the exact path where the file is present on the machine from which the e-service is tested
 
 {% code overflow="wrap" %}
 ```bash
@@ -74,4 +71,4 @@ curl --location 'https://mtls.eservices.att.interop.pagopa.it/fiscalcode-verific
 ```
 {% endcode %}
 
-\
+\\
